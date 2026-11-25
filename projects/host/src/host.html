@@ -1,0 +1,97 @@
+<header>
+  <div class="bar">
+    <span class="brand"><img src="/brand/angular-experts.svg" width="146" height="52" alt="Angular Experts"> Federation lab</span>
+    <span>Angular {{ platform.shared['@angular/core'] }}</span>
+  </div>
+</header>
+<main>
+  <h1>Remote <span>explorer</span></h1>
+  <p class="intro">Discover team packages, inspect their requirements, and load a feature into the running host.</p>
+  <div class="layout">
+    <section class="panel">
+      <h2>Remote definitions</h2>
+      <p class="muted">Load the catalog and register each compatible Native Federation entry.</p>
+      <button class="primary" [disabled]="busy()" (click)="discover()">Discover remotes</button>
+      @if (error()) { <p role="alert">{{ error() }}</p> }
+      @for (remote of remotes(); track remote.title) {
+        <article>
+          <div class="row"><h3>{{ remote.title }}</h3><code>{{ remote.name }}</code></div>
+          <p>{{ remote.team }}</p>
+          <dl class="metrics">
+            <div><dt>With sharing</dt><dd>{{ size(remote.bundleBytes) }}</dd></div>
+            @if (remote.standaloneBytes !== undefined) {
+              <div><dt>Without sharing</dt><dd>{{ size(remote.standaloneBytes) }}</dd></div>
+              <div class="savings"><dt>Saved by sharing</dt><dd>{{ size(remote.standaloneBytes - remote.bundleBytes) }}</dd></div>
+            }
+          </dl>
+          @for (dep of remote.bundled; track dep[0]) {
+            <div class="dependency"><code>{{ dep[0] }}</code><span>{{ size(dep[1]) }} bundled</span></div>
+          } @empty { <p>All dependencies supplied by the host.</p> }
+          @if (remote.mismatch) { <p class="warning">{{ remote.mismatch }}</p> }
+          <button [disabled]="!!remote.mismatch || busy()" (click)="open(remote)">Open {{ remote.title.toLowerCase() }}</button>
+        </article>
+      }
+    </section>
+    <aside class="panel runtime">
+      <h2>Host runtime</h2>
+      <p class="muted">Minified, uncompressed JavaScript in the production build.</p>
+      <dl class="metrics">
+        <div><dt>Total host JS</dt><dd>{{ size(platform.hostBytes) }}</dd></div>
+        <div><dt>Shared JS within host</dt><dd>{{ size(platform.sharedBytes) }}</dd></div>
+        @if (savedBytes() !== undefined) {
+          <div class="savings"><dt>Saved across compatible remotes</dt><dd>{{ size(savedBytes()!) }}</dd></div>
+        }
+      </dl>
+      @if (savedBytes() !== undefined) {
+        <p class="muted">Savings compare each remote’s shipped JS with a build that bundles its own dependencies.</p>
+      }
+      <h3 id="shared-versions">Shared package versions</h3>
+      <p class="muted">
+        @if (remotes().length) { Each remote requires an exact match with the host. }
+        @else { Discover remotes to compare their requirements with the host. }
+      </p>
+      <div class="version-scroll">
+        <table aria-labelledby="shared-versions" class="versions">
+          <thead><tr>
+            <th scope="col">Package</th><th scope="col">Host provides</th>
+            @for (remote of remotes(); track remote.name) { <th scope="col">{{ remote.title }} requires</th> }
+          </tr></thead>
+          <tbody>
+            @for (pkg of packages(); track pkg) {
+              <tr>
+                <th scope="row"><code>{{ pkg }}</code></th>
+                <td>{{ platform.shared[pkg] ?? 'Unavailable' }}</td>
+                @for (remote of remotes(); track remote.name) {
+                  <td>{{ remote.required[pkg] ?? '—' }}
+                    @if (remote.required[pkg] && remote.required[pkg] !== platform.shared[pkg]) { <strong class="warning">Mismatch</strong> }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <h3>Shared session</h3>
+      <p class="session-state">Count {{ session.count() }} · Last writer {{ session.lastWriter() }}</p>
+      <button (click)="session.record('host')">Record from host</button>
+    </aside>
+  </div>
+  <section class="panel feature" aria-label="Loaded remote">
+    @if (!selected()) {
+      <h2>Feature outlet</h2><p class="muted">Open a discovered remote to mount it here.</p>
+    }
+    <ng-container #outlet></ng-container>
+    @if (routerIdentity()) { <p class="proof">{{ routerIdentity() }}</p> }
+    @if (httpIdentity()) { <p class="proof">{{ httpIdentity() }}</p> }
+    <router-outlet />
+  </section>
+  <section class="panel feature" aria-label="Host HTTP interceptor">
+    <h2>Host HTTP interceptor</h2>
+    <p class="muted">Send a request here or from Activity. The host interceptor logs each response here and in the browser console.</p>
+    <button (click)="sendHostRequest()">Send request from host</button>
+    <ol aria-live="polite">
+      @for (entry of httpLog.entries(); track $index) { <li><code>{{ entry }}</code></li> }
+    </ol>
+  </section>
+  <section class="panel feature"><demo-request-table [remotes]="remotes()" /></section>
+</main>

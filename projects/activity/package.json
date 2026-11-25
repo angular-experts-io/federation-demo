@@ -1,0 +1,15 @@
+{
+  "name": "@demo/activity",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@angular/core": ">=21.2.0 <23",
+    "@angular/common": ">=21.2.0 <23",
+    "@angular/router": ">=21.2.0 <23",
+    "rxjs": "^7.8.2",
+    "@demo/workshop-session": "1.0.0"
+  },
+  "demo": {
+    "title": "Activity",
+    "team": "Team A"
+  }
+}

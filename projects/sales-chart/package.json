@@ -1,0 +1,18 @@
+{
+  "name": "@demo/sales-chart",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@angular/core": ">=21.2.0 <23",
+    "@demo/workshop-session": "1.0.0"
+  },
+  "dependencies": {
+    "chart.js": "4.4.8"
+  },
+  "bundledDependencies": [
+    "chart.js"
+  ],
+  "demo": {
+    "title": "Sales chart",
+    "team": "Team B"
+  }
+}

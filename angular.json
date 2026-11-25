@@ -1,0 +1,86 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "cli": {
+    "analytics": false
+  },
+  "projects": {
+    "host": {
+      "projectType": "application",
+      "root": "projects/host",
+      "sourceRoot": "projects/host/src",
+      "architect": {
+        "build": {
+          "builder": "@angular-architects/native-federation:build",
+          "options": {
+            "target": "host:esbuild",
+            "tsConfig": "projects/host/tsconfig.federation.json"
+          }
+        },
+        "esbuild": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/host/src/main.ts",
+            "tsConfig": "projects/host/tsconfig.app.json",
+            "index": {
+              "input": "projects/host/src/index.html",
+              "preloadInitial": false
+            },
+            "styles": [
+              "projects/host/src/styles.css"
+            ],
+            "outputPath": "dist/host",
+            "optimization": {
+              "scripts": true,
+              "styles": {
+                "minify": true,
+                "inlineCritical": false
+              },
+              "fonts": false
+            },
+            "sourceMap": false,
+            "polyfills": [
+              "es-module-shims"
+            ],
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/host/public",
+                "output": "/"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "activity": {
+      "projectType": "library",
+      "root": "projects/activity",
+      "sourceRoot": "projects/activity/src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/activity/ng-package.json",
+            "tsConfig": "projects/activity/tsconfig.lib.json"
+          }
+        }
+      }
+    },
+    "sales-chart": {
+      "projectType": "library",
+      "root": "projects/sales-chart",
+      "sourceRoot": "projects/sales-chart/src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/sales-chart/ng-package.json",
+            "tsConfig": "projects/sales-chart/tsconfig.lib.json"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+[
+  "@angular/core",
+  "@angular/common",
+  "@angular/router",
+  "@angular/platform-browser",
+  "@angular/forms",
+  "@angular/cdk",
+  "rxjs",
+  "@demo/workshop-session"
+]
